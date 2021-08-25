@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.dbtechprojects.dummyuserapi.R
+import com.dbtechprojects.dummyuserapi.databinding.ActivityMainBinding
 import com.dbtechprojects.dummyuserapi.di.Injection
 import com.dbtechprojects.dummyuserapi.ui.viewmodels.UserListViewModel
 import com.dbtechprojects.dummyuserapi.util.ViewUtils
@@ -15,11 +16,14 @@ import kotlinx.coroutines.InternalCoroutinesApi
 class MainActivity : AppCompatActivity() {
     @InternalCoroutinesApi
     private lateinit var viewModel: UserListViewModel
+    private var _binding: ActivityMainBinding? = null
+    private val binding get() = _binding!!
     private  val TAG = "MainActivity"
     @InternalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        _binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         viewModel = ViewModelProvider(this, Injection.provideViewModelFactory()).get(UserListViewModel::class.java)
 
         lifecycleScope.launchWhenStarted {

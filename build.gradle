@@ -31,4 +31,5 @@ ext {
     okhttpLoggingInterceptorVersion = '4.9.0'
     coroutines = '1.4.3'
     glideVersion = '4.12.0'
+    circleImageViewVersion='3.1.0'
 }
