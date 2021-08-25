@@ -1,4 +1,4 @@
-package com.dbtechprojects.dummyuserapi.models.reponses
+package com.dbtechprojects.dummyuserapi.models.responses
 
 import com.dbtechprojects.dummyuserapi.models.User
 import com.google.gson.annotations.SerializedName

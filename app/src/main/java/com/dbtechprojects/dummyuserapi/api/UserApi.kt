@@ -1,6 +1,6 @@
 package com.dbtechprojects.dummyuserapi.api
 
-import com.dbtechprojects.dummyuserapi.models.reponses.BaseApiResponse
+import com.dbtechprojects.dummyuserapi.models.responses.BaseApiResponse
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.Response
