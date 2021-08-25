@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">DummyUserApi</string>
+    <string name="InternetConnectionError">Failure retrieving users please check internet connection</string>
 </resources>
