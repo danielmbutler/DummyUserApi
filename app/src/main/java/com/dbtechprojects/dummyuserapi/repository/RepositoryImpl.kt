@@ -1,5 +1,6 @@
 package com.dbtechprojects.dummyuserapi.repository
 
+import android.util.Log
 import com.dbtechprojects.dummyuserapi.api.UserApi
 import com.dbtechprojects.dummyuserapi.models.User
 import com.dbtechprojects.dummyuserapi.util.Constants
@@ -24,6 +25,7 @@ class RepositoryImpl(private val userApi: UserApi) : MainRepository {
 
             } catch (e: Exception){
                 this.emit(Resource.Error<List<User>>(Constants.API_INTERNET_ERROR))
+                Log.d(TAG, e.message.toString())
             }
         }
     }
