@@ -3,12 +3,12 @@ package com.dbtechprojects.dummyuserapi.repository
 import android.util.Log
 import com.dbtechprojects.dummyuserapi.api.UserApi
 
-class RepositoryImpl(private val userApi: UserApi) {
+class RepositoryImpl(private val userApi: UserApi) : MainRepository {
 
     private val TAG = "RepositoryImpl"
 
-    suspend fun getUsers(){
-        val response = userApi.getUsers(0)
+    override suspend fun getUsers(page: Int){
+        val response = userApi.getUsers(page)
         Log.d(TAG, response.body().toString())
     }
 }
