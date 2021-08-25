@@ -13,11 +13,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        viewModel = ViewModelProvider(
-            this, Injection.provideViewModelFactory(
-                context = this,
-            )
-        )
-            .get(UserListViewModel::class.java)
+        viewModel = ViewModelProvider(this, Injection.provideViewModelFactory()).get(UserListViewModel::class.java)
     }
 }
