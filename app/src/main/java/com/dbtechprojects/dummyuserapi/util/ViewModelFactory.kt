@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.dbtechprojects.dummyuserapi.di.DispatcherProvider
 import com.dbtechprojects.dummyuserapi.repository.MainRepository
-import com.dbtechprojects.dummyuserapi.ui.userlist.UserListViewModel
+import com.dbtechprojects.dummyuserapi.ui.userList.UserListViewModel
 import kotlinx.coroutines.InternalCoroutinesApi
 
 /**
