@@ -18,7 +18,7 @@ interface UserApi {
     @GET("user/?limit=${Constants.limitOfUsersPerApiCall}")
     suspend fun getUsers(
         @Query("page") page: Int,
-    ): Response<UserResponse>
+    ): UserResponse
 
     companion object {
         private const val BASE_URL = "https://dummyapi.io/data/v1/"

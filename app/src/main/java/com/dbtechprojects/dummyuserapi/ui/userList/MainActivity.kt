@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -12,10 +13,14 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.dbtechprojects.dummyuserapi.databinding.ActivityMainBinding
 import com.dbtechprojects.dummyuserapi.di.Injection
 import com.dbtechprojects.dummyuserapi.models.User
+import com.dbtechprojects.dummyuserapi.models.responses.UserResponse
+import com.dbtechprojects.dummyuserapi.ui.userList.state.UserListAction
+import com.dbtechprojects.dummyuserapi.ui.userList.state.UserListViewState
 import com.dbtechprojects.dummyuserapi.util.Constants
 import com.dbtechprojects.dummyuserapi.util.ViewUtils
-import com.yougetme.app.api.Resource
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     @InternalCoroutinesApi
@@ -29,7 +34,6 @@ class MainActivity : AppCompatActivity() {
     private var userList = mutableListOf<User>()
     private var userCount = 0
     private var shouldPaginate = true
-    private var pageNumber = 1
 
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -43,11 +47,22 @@ class MainActivity : AppCompatActivity() {
             Injection.provideViewModelFactory()
         ).get(UserListViewModel::class.java)
         setupRv()
+        setupClicks()
 
         lifecycleScope.launchWhenStarted {
-            initObservers()
+            observeViewModel()
         }
     }
+
+    @InternalCoroutinesApi
+    private fun setupClicks() {
+        binding.listViewGetUserButton.setOnClickListener {
+            lifecycleScope.launch {
+                viewModel.userIntent.send(UserListAction.FetchUser)
+            }
+        }
+    }
+
 
     @InternalCoroutinesApi
     private fun setupRv() {
@@ -57,9 +72,9 @@ class MainActivity : AppCompatActivity() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
 
                 if (!recyclerView.canScrollVertically(RecyclerView.FOCUS_DOWN)) {
-                    if (shouldPaginate) {
-                        pageNumber++
-                        viewModel.getUsers(pageNumber)
+                    // recyclerview is at the bottom so lets fetch more users
+                    lifecycleScope.launch {
+                        viewModel.userIntent.send(UserListAction.FetchUser)
                     }
                 }
 
@@ -70,51 +85,59 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     @InternalCoroutinesApi
-    private fun initObservers() {
-        viewModel.users.observe(this, { userResponse ->
-            when (userResponse) {
-                is Resource.Loading -> {
-                    ViewUtils.showProgress(this)
-                }
-                is Resource.Success -> {
-                    ViewUtils.progressDismiss(this)
-                    userResponse.data?.let { response ->
-                        response.data.let { userListFromApi ->
-                            Log.d(TAG, userListFromApi.toString())
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            viewModel.state.collect { viewState ->
+                when (viewState) {
+                    is UserListViewState.Idle -> {
+                    }
 
-                            userList.addAll(userListFromApi)
-                            adapter.updateList(userList)
+                    is UserListViewState.Loading -> {
+                        ViewUtils.showProgress(this@MainActivity)
+                    }
 
-                            userCount = userList.size
-                            /*
-                            if the users count is great or equal to the total users minus the amount of users the
-                            app queries per api call then we no longer need to request more users
-                            as all users have already been requested
-                             */
-                            Log.d(TAG, "userlistsize : ${userList.size}")
-                            Log.d(TAG, "shouldPaginate $shouldPaginate")
-                            if (userCount >= (response.total - Constants.limitOfUsersPerApiCall)){
-                                shouldPaginate = false
-                                addEndOfUsersMessage()
-                            }
-                        }
+                    is UserListViewState.Error -> {
+                        ViewUtils.showErrorSnackBar(binding.root, viewState.error)
+                        binding.listViewGetUserButton.visibility = View.VISIBLE
+                        ViewUtils.progressDismiss(this@MainActivity)
+                    }
 
+                    is UserListViewState.Users -> {
+                        ViewUtils.progressDismiss(this@MainActivity)
+                        binding.listViewGetUserButton.visibility = View.GONE
+                        binding.listViewRv.visibility = View.VISIBLE
+                        renderList(viewState.user)
                     }
                 }
-                is Resource.Error -> {
-                    Log.d(TAG, "${userResponse.error}")
-                    ViewUtils.progressDismiss(this)
-                    ViewUtils.showErrorSnackBar(binding.root, userResponse.error)
-                }
             }
-        })
+        }
     }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun renderList(users: UserResponse) {
+        userList.addAll(users.data)
+        adapter.updateList(userList)
+
+        userCount = userList.size
+        /*
+        if the users count is great or equal to the total users minus the amount of users the
+        app queries per api call then we no longer need to request more users
+        as all users have already been requested
+         */
+        Log.d(TAG, "userlistsize : ${userList.size}")
+        Log.d(TAG, "shouldPaginate $shouldPaginate")
+        if (userCount >= (users.total - Constants.limitOfUsersPerApiCall)) {
+            shouldPaginate = false
+            addEndOfUsersMessage()
+        }
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun addEndOfUsersMessage() {
         val fake = User(
             id = "",
-            firstName = "No Users" ,
+            firstName = "No Users",
             lastName = "Remaining",
             title = "",
             picture = ""

@@ -1,16 +1,17 @@
 package com.dbtechprojects.dummyuserapi.ui.userList
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dbtechprojects.dummyuserapi.di.DispatcherProvider
-import com.dbtechprojects.dummyuserapi.models.responses.UserResponse
 import com.dbtechprojects.dummyuserapi.repository.MainRepository
-import com.yougetme.app.api.Resource
+import com.dbtechprojects.dummyuserapi.ui.userList.state.UserListAction
+import com.dbtechprojects.dummyuserapi.ui.userList.state.UserListViewState
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 
 @InternalCoroutinesApi
@@ -19,22 +20,37 @@ class UserListViewModel (
     private val dispatcherProvider: DispatcherProvider
     ) : ViewModel() {
 
-    private val TAG = "UserListViewModel"
+    val userIntent = Channel<UserListAction>(Channel.UNLIMITED)
+    private val _state = MutableStateFlow<UserListViewState>(UserListViewState.Idle)
+    val state: StateFlow<UserListViewState>
+        get() = _state
 
-    private var _users = MutableLiveData<Resource<UserResponse>>()
-    val users : LiveData<Resource<UserResponse>>
-        get() = _users
+    private var pageNumber = 1
 
     init {
-        getUsers(0)
+        handleIntent()
     }
 
-    @InternalCoroutinesApi
-    fun getUsers(page: Int){
+    private fun handleIntent() {
+        viewModelScope.launch {
+            userIntent.consumeAsFlow().collect {
+                when (it) {
+                    is UserListAction.FetchUser -> {
+                        fetchUser(pageNumber)
+                        pageNumber++
+                    }
+                }
+            }
+        }
+    }
+
+    private fun fetchUser(page: Int) {
         viewModelScope.launch(dispatcherProvider.io) {
-            repository.getUsers(page).collect { response ->
-                Log.d(TAG, "received users in viewmodel $response")
-                _users.postValue(response)
+            _state.value = UserListViewState.Loading
+            _state.value = try {
+                UserListViewState.Users(repository.getUsers(page))
+            } catch (e: Exception) {
+                UserListViewState.Error(e.localizedMessage)
             }
         }
     }
