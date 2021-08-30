@@ -29,12 +29,7 @@ class MainActivity : AppCompatActivity() {
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
     private val TAG = "MainActivity"
-
-    //pagination variables
     private var userList = mutableListOf<User>()
-    private var userCount = 0
-    private var shouldPaginate = true
-
 
     @RequiresApi(Build.VERSION_CODES.N)
     @InternalCoroutinesApi
@@ -108,6 +103,9 @@ class MainActivity : AppCompatActivity() {
                         binding.listViewRv.visibility = View.VISIBLE
                         renderList(viewState.user)
                     }
+                    is UserListViewState.QueryExhausted -> {
+                        addEndOfUsersMessage()
+                    }
                 }
             }
         }
@@ -117,19 +115,6 @@ class MainActivity : AppCompatActivity() {
     private fun renderList(users: UserResponse) {
         userList.addAll(users.data)
         adapter.updateList(userList)
-
-        userCount = userList.size
-        /*
-        if the users count is great or equal to the total users minus the amount of users the
-        app queries per api call then we no longer need to request more users
-        as all users have already been requested
-         */
-        Log.d(TAG, "userlistsize : ${userList.size}")
-        Log.d(TAG, "shouldPaginate $shouldPaginate")
-        if (userCount >= (users.total - Constants.limitOfUsersPerApiCall)) {
-            shouldPaginate = false
-            addEndOfUsersMessage()
-        }
     }
 
 
