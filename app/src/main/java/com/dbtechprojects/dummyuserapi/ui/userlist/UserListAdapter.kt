@@ -1,4 +1,4 @@
-package com.dbtechprojects.dummyuserapi.ui.adapters
+package com.dbtechprojects.dummyuserapi.ui.userlist
 
 
 import android.os.Build

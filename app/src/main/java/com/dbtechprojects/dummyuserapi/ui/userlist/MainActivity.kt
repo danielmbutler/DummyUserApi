@@ -1,4 +1,4 @@
-package com.dbtechprojects.dummyuserapi.ui.activities
+package com.dbtechprojects.dummyuserapi.ui.userlist
 
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -12,8 +12,6 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.dbtechprojects.dummyuserapi.databinding.ActivityMainBinding
 import com.dbtechprojects.dummyuserapi.di.Injection
 import com.dbtechprojects.dummyuserapi.models.User
-import com.dbtechprojects.dummyuserapi.ui.adapters.UserListAdapter
-import com.dbtechprojects.dummyuserapi.ui.viewmodels.UserListViewModel
 import com.dbtechprojects.dummyuserapi.util.Constants
 import com.dbtechprojects.dummyuserapi.util.ViewUtils
 import com.yougetme.app.api.Resource
@@ -30,7 +28,6 @@ class MainActivity : AppCompatActivity() {
     //pagination variables
     private var userList = mutableListOf<User>()
     private var userCount = 0
-    private var userRemainingCount = 0
     private var shouldPaginate = true
     private var pageNumber = 1
 

@@ -1,4 +1,4 @@
-package com.dbtechprojects.dummyuserapi.ui.viewmodels
+package com.dbtechprojects.dummyuserapi.ui.userlist
 
 import android.util.Log
 import androidx.lifecycle.LiveData
