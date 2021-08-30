@@ -4,7 +4,7 @@ Basic Api to show pagination with the dummyUser API : https://dummyapi.io/
 
 ## Features
 * Kotlin
-* MVVM
+* MVVM / MVI (with ViewState)
 * Retrofit
 * Glide
 * Manual Dependency Injection

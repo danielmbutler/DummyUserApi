@@ -1,6 +1,6 @@
 package com.dbtechprojects.dummyuserapi.ui.adapters
 
-import android.annotation.SuppressLint
+
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -17,10 +17,11 @@ class UserListAdapter(
     private var dataSet: List<User> = ArrayList<User>()
     @RequiresApi(api = Build.VERSION_CODES.N)
 
-    fun setDataSet(value: List<User>) {
+    fun updateList(value: List<User>) {
         dataSet = value
         notifyDataSetChanged()
     }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RVViewHolder {
         return RVViewHolder.getViewHolder(parent)

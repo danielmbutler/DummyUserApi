@@ -1,6 +1,7 @@
 package com.dbtechprojects.dummyuserapi.api
 
-import com.dbtechprojects.dummyuserapi.models.responses.BaseApiResponse
+import com.dbtechprojects.dummyuserapi.models.responses.UserResponse
+import com.dbtechprojects.dummyuserapi.util.Constants
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.Response
@@ -14,10 +15,10 @@ interface UserApi {
     /**
      * Get repos ordered by stars.
      */
-    @GET("user/?limit=20")
+    @GET("user/?limit=${Constants.limitOfUsersPerApiCall}")
     suspend fun getUsers(
         @Query("page") page: Int,
-    ): Response<BaseApiResponse>
+    ): Response<UserResponse>
 
     companion object {
         private const val BASE_URL = "https://dummyapi.io/data/v1/"
