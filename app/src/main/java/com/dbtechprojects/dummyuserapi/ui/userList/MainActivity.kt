@@ -130,4 +130,9 @@ class MainActivity : AppCompatActivity() {
         userList.add(fake)
         adapter.updateList(userList)
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
 }
